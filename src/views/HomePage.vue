@@ -1,6 +1,22 @@
 <template>
   <main v-if="!loading">
-Show Data
+    <data-title :text="title"
+                :data-date="dataDate"
+    />
+    <data-boxes :status="status"/>
+
+    <SelectCountry @get-country="getCountryData"
+                   :countries="countries"/>
+
+    <button @click="clearCountryData"
+          v-if="status.Country"
+          class="bg-green-600
+                   text-white
+                   rounded p-3 mt-10 mb-10
+                   focus:outline-none
+                   hover:bg-green-500">
+     Clear Country
+    </button>
   </main>
 
   <main v-else class="flex flex-col align-center justify-center text-center" >
@@ -12,11 +28,19 @@ Show Data
 </template>
 
 <script>
+import dataTitle from "@/components/DataTitle";
+import dataBoxes from "@/components/DataBoxes";
+import SelectCountry from "@/components/SelectCountry";
 export default {
   name: 'HomePage',
+  components:{
+    dataTitle,
+    dataBoxes,
+    SelectCountry
+  },
   data(){
    return {
-     loading : true,
+     loading : false,
      title: 'Global',
      dataDate: '',
      status:{},
@@ -32,6 +56,17 @@ export default {
   const data = await responce.json()
     return data
   },
+     getCountryData(country){
+       this.status = country
+       this.title = country.Country
+    },
+   async clearCountryData(){
+       this.loading = true
+       const data = await this.fetchCovidData()
+       this.title = 'Global'
+      this.status = data.Global
+     this.loading =false
+    }
   },
 async created() {
     const data = await this.fetchCovidData()
